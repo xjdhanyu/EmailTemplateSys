@@ -17,35 +17,15 @@ public class Template {
 
     public String evaluate() {
         TemplateParse parser = new TemplateParse();
-        List<String> segments = parser.parse(this.templateText);
+        List<Segment> segments = parser.parseSegments(this.templateText);
         return concatenate(segments);
     }
 
-    private String concatenate(List<String> segments) {
+    private String concatenate(List<Segment> segments) {
         StringBuilder result = new StringBuilder();
-        for (String segment : segments) {
-            append(segment, result);
+        for (Segment segment : segments) {
+            result.append(segment.evaluate(variableValues));
         }
         return result.toString();
-    }
-
-    private void append(String segment, StringBuilder result) {
-        if (isVariable(segment)) {
-            evaluateVariable(segment, result);
-        } else {
-            result.append(segment);
-        }
-    }
-
-    public static boolean isVariable(String segment) {
-        return segment.startsWith("${") && segment.endsWith("}");
-    }
-
-    private void evaluateVariable(String segment, StringBuilder result) {
-        String var = segment.substring(2, segment.length() - 1);
-        if (!variableValues.containsKey(var)){
-            throw new MissingValueException("No value for " + segment);
-        }
-        result.append(variableValues.get(var));
     }
 }

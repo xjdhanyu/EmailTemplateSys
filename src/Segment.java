@@ -1,5 +1,5 @@
-/**
- * Created by wuxiaoning on 14-3-23.
- */
+import java.util.Map;
+
 public interface Segment {
+    String evaluate(Map<String, String> variables);
 }
