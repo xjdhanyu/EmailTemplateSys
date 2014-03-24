@@ -5,33 +5,15 @@ import java.util.regex.Pattern;
 
 
 public class TemplateParse {
-    public List<String> parse(String template) {
-        List<String> segments = new ArrayList<String>();
+    public List<Segment> parseSegments(String template) {
+        List<Segment> segments = new ArrayList<Segment>();
         int index = collectSegments(segments, template);
         addTail(segments, template, index);
         addEmptyStringIfTemplateWasEmpty(segments);
         return segments;
     }
 
-    public List<Segment> parseSegments(String template) {
-        List<Segment> segments = new ArrayList<Segment>();
-        List<String> strings = parse(template);
-        for (String s : strings) {
-            if (isVariable(s)){
-                String name = s.substring(2, s.length() - 1);
-                segments.add(new Variable(name));
-            } else {
-                segments.add(new PlainText(s));
-            }
-        }
-        return segments;
-    }
-
-    private boolean isVariable(String segment) {
-        return segment.startsWith("${") && segment.endsWith("}");
-    }
-
-    private int collectSegments(List<String> segs, String src) {
+    private int collectSegments(List<Segment> segs, String src) {
         Pattern pattern = Pattern.compile("\\$\\{[^}]*\\}");
         Matcher matcher = pattern.matcher(src);
         int index = 0;
@@ -43,24 +25,25 @@ public class TemplateParse {
         return index;
     }
 
-    private void addTail(List<String> segs, String template, int index) {
+    private void addTail(List<Segment> segs, String template, int index) {
         if (index < template.length()) {
-            segs.add(template.substring(index));
+            segs.add(new PlainText(template.substring(index)));
         }
     }
 
-    private void addVariable(List<String> segs, String src, Matcher m) {
-        segs.add(src.substring(m.start(), m.end()));
+    private void addVariable(List<Segment> segs, String src, Matcher m) {
+        String variable = src.substring(m.start(), m.end());
+        segs.add(new Variable(variable.substring(2, variable.length() - 1)));
     }
 
-    private void addPrecedingPlainText(List<String> segs, String src, Matcher m, int index) {
+    private void addPrecedingPlainText(List<Segment> segs, String src, Matcher m, int index) {
         if (index != m.start()) {
-            segs.add(src.substring(index, m.start()));
+            segs.add(new PlainText(src.substring(index, m.start())));
         }
     }
 
-    private void addEmptyStringIfTemplateWasEmpty(List<String> segs) {
+    private void addEmptyStringIfTemplateWasEmpty(List<Segment> segs) {
         if (segs.isEmpty())
-            segs.add("");
+            segs.add(new PlainText(""));
     }
 }

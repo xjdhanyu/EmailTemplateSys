@@ -14,4 +14,8 @@ public class PlainText implements Segment {
     public String evaluate(Map<String, String> variables) {
         return text;
     }
+
+    public String toString() {
+        return text;
+    }
 }

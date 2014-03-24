@@ -17,4 +17,8 @@ public class Variable implements Segment {
         }
         return variables.get(name);
     }
+
+    public String toString() {
+        return name;
+    }
 }
